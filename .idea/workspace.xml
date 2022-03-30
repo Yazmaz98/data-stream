@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="23846548-7907-4d6d-9452-0c61bdd32ea6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/5models_80iters.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/5models_lm_trees.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/plot_preds.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ingest_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/ingest_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/receive.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plot_preds.py" beforeDir="false" afterPath="$PROJECT_DIR$/plot_preds.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

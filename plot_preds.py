@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 from kafka import KafkaProducer
 from kafka import KafkaConsumer
-from river import linear_model, ensemble, tree, preprocessing, evaluate, metrics
+from river import linear_model, ensemble, tree, preprocessing, evaluate, metrics, time_series, optim
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 
@@ -37,6 +37,25 @@ river_hoeffding = (
 			model_selector_decay=0.9
 		)
 )
+# SNARIMAX FROM RIVER
+snarimax = (
+	time_series.SNARIMAX(
+		p=0,
+		d=0,
+		q=0,
+		m=12,
+		sp=3,
+		sq=6,
+		regressor=(
+			preprocessing.StandardScaler() |
+			linear_model.LinearRegression(
+				intercept_init=110,
+				optimizer=optim.SGD(0.01),
+				intercept_lr=0.3
+			)
+		)
+	)
+)
 
 metric = metrics.RMSE()
 
@@ -50,7 +69,7 @@ lm_rmse, river_lm_rmse = [], []
 rf_rmse, rbt_rmse, hfdg_rmse = [], [], []
 ts_rmse, river_ts_rmse = [], []
 
-y_lm, y_rlm, y_rf, y_rbt, y_rhfdg = [], [], [], [], []
+y_lm, y_rlm, y_rf, y_rbt, y_rhfdg, y_snarimax = [], [], [], [], [], []
 
 fig = plt.figure()
 is_plotted = False
@@ -74,6 +93,7 @@ for message in consumer:
 		river_bagging_trees = river_bagging_trees.learn_one({'x': X_t}, y_t)  # learn on this set
 		river_hoeffding = river_hoeffding.learn_one({'x': X_t}, y_t)
 		river_lm = river_lm.learn_one({'x': X_t}, y_t)
+		snarimax = snarimax.learn_one(y=y_t)
 		# ---------------------------------------------------------
 
 		# create set for sklearn linear regressor
@@ -87,6 +107,7 @@ for message in consumer:
 		river_bagging_trees = river_bagging_trees.learn_one({'x': stream[-2]}, stream[-1])
 		river_hoeffding = river_hoeffding.learn_one({'x': stream[-2]}, stream[-1])
 		river_lm = river_lm.learn_one({'x': stream[-2]}, stream[-1])
+		snarimax = snarimax.learn_one(y=stream[-1])
 		# ------------------------------------------
 		x_batch.append(stream[-2])
 		y_batch.append(stream[-1])
@@ -107,6 +128,7 @@ for message in consumer:
 			y_pred_river_lm = [river_lm.predict_one({'x': x}) for x in X_test]
 			y_pred_river_rbt = [river_bagging_trees.predict_one({'x': x}) for x in X_test]
 			y_pred_river_hfdg = [river_hoeffding.predict_one({'x': x}) for x in X_test]
+			y_pred_river_snarimax = [snarimax.forecast(horizon=1, xs=None) for x in X_test]
 			# ------------------------------------------
 
 			# ---------linear models errors --------------
@@ -120,6 +142,10 @@ for message in consumer:
 			print(f'Hoeffding regressor RMSE (river): {mean_squared_error(y_test, y_pred_river_hfdg)}')
 			# ------------------------------------------
 
+			# ---------Time series models errors --------------
+			print(f'SNARIMAX RMSE (river): {mean_squared_error(y_test, y_pred_river_snarimax)}')
+			# ------------------------------------------
+
 			# --------- errors list for plots --------------
 			lm_rmse.append(mean_squared_error(y_test, y_pred_lm))
 			river_lm_rmse.append(mean_squared_error(y_test, y_pred_river_lm))
@@ -127,6 +153,8 @@ for message in consumer:
 			rf_rmse.append(mean_squared_error(y_test, y_pred_rf))
 			rbt_rmse.append(mean_squared_error(y_test, y_pred_river_rbt))
 			hfdg_rmse.append(mean_squared_error(y_test, y_pred_river_hfdg))
+			# ---
+			river_ts_rmse.append(mean_squared_error(y_test, y_pred_river_snarimax))
 			# ----------------------------------------------
 
 			x_batch = x_batch + X_test
@@ -137,9 +165,7 @@ for message in consumer:
 			y_rf.extend(y_pred_rf)
 			y_rbt.extend(y_pred_river_rbt)
 			y_rhfdg.extend(y_pred_river_hfdg)
-			print('------////------')
-			print(len(stream))
-			print(len(y_lm))
+			y_snarimax.extend(y_pred_river_snarimax)
 
 			ax1.plot(
 				stream[MIN_TRAIN + 1: -1], color='green', label='Stream data', linewidth=4
@@ -149,12 +175,14 @@ for message in consumer:
 			ax1.plot(y_rf, color='yellow', label='Random forest')
 			ax1.plot(y_rbt, color='red', label='River Bagging regressor')
 			ax1.plot(y_rhfdg, color='blue', label='River Hoeffding tree regressor')
+			ax1.plot(y_snarimax, color='black', label='River SNARIMAX model')
 
 			ax2.plot(lm_rmse, color='magenta', label='Linear model')
 			ax2.plot(river_lm_rmse, color='cyan', label='River linear model')
 			ax2.plot(rf_rmse, color='green', label='Random forest')
 			ax2.plot(rbt_rmse, color='red', label='River Bagging regressor')
 			ax2.plot(hfdg_rmse, color='blue', label='River Hoeffding tree regressor')
+			ax2.plot(river_ts_rmse, color='black', label='River SNARIMAX model')
 
 			if not is_plotted:
 				ax1.legend()
