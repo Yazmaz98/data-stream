@@ -25,7 +25,7 @@ while True:
 	print(f"Sending stocks info to topic: {topic_name} at time {time.time()}")
 	print(message)
 
-	time.sleep(1)
+	time.sleep(5)
     
 
 
