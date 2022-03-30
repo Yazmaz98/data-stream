@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="23846548-7907-4d6d-9452-0c61bdd32ea6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/forecast.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/trees.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lm_trees.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/receive_2.py" beforeDir="false" afterPath="$PROJECT_DIR$/linear_model.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +46,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.trees">
+  <component name="RunManager" selected="Python.lm_trees">
     <configuration name="forecast" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -112,7 +110,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="receive" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="lm_trees" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -124,7 +122,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/receive.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/lm_trees.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -156,11 +154,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.lm_trees" />
+        <item itemvalue="Python.linear_model" />
         <item itemvalue="Python.trees" />
         <item itemvalue="Python.forecast" />
         <item itemvalue="Python.ingest_data" />
-        <item itemvalue="Python.linear_model" />
-        <item itemvalue="Python.receive" />
       </list>
     </recent_temporary>
   </component>
