@@ -22,14 +22,11 @@ from sklearn.linear_model import LinearRegression
 from statsmodels.tsa.arima.model import ARIMA
 from tqdm import tqdm
 
-from ingest_data import start_producer
-from ARIMA_model import *
+from ARIMA_model import ARIMA_model, create_dataset
 
-STOCK_NAME = "AMZN"
-TIME_SLEEP = 5
-
-start_producer(stock_name=STOCK_NAME, time_sleep=TIME_SLEEP)
+STOCK_NAME = 'stocks_test'
 consumer = KafkaConsumer(STOCK_NAME, bootstrap_servers="localhost:9092", group_id="group-1")
+
 # LINEAR MODEL FROM RIVER
 river_lm = (
 	preprocessing.StandardScaler() |
@@ -81,7 +78,7 @@ MIN_TRAIN = 20  # construct first model on 20 samples at least
 TRAIN_EVERY = 10
 lm_rmse, river_lm_rmse = [], []
 rf_rmse, rbt_rmse, hfdg_rmse = [], [], []
-ts_rmse, river_ts_rmse = [], []
+arima_rmse, river_ts_rmse = [], []
 
 y_lm, y_rlm, y_rf, y_rbt, y_rhfdg, y_arima, y_snarimax = [], [], [], [], [], [], []
 
@@ -139,8 +136,9 @@ for message in consumer:
 			# ------------------------------------------
 
 			# ---------ARIMA batch model fitted and predicted-
-			X_train_arima, _ = create_dataset(X_batch, n_samples=len(X_batch) - TRAIN_EVERY - 1)
-			y_pred_arima = ARIMA_model.fit_predict(X_train_arima, y_test)
+			arima_model = ARIMA_model()
+			X_train_arima, _ = create_dataset(x_batch, n_samples=len(x_batch) - TRAIN_EVERY - 1)
+			#y_pred_arima = arima_model.fit_predict(X_train_arima, y_test)
 			# ------------------------------------------
 
 			# ---------online models predictions--------------
@@ -163,7 +161,7 @@ for message in consumer:
 
 			# ---------Time series models errors --------------
 			print(f'SNARIMAX RMSE (river): {mean_squared_error(y_test, y_pred_river_snarimax)}')
-			print(f'ARIMA RMSE (batch): {mean_squared_error(y_test, y_pred_arima)}')
+			#print(f'ARIMA RMSE (batch): {mean_squared_error(y_test, y_pred_arima)}')
 			# ------------------------------------------
 
 			# --------- errors list for plots --------------
@@ -175,7 +173,7 @@ for message in consumer:
 			hfdg_rmse.append(mean_squared_error(y_test, y_pred_river_hfdg))
 			# ---
 			river_ts_rmse.append(mean_squared_error(y_test, y_pred_river_snarimax))
-
+			#arima_rmse.append(mean_squared_error(y_test, y_pred_arima))
 			# ----------------------------------------------
 
 			x_batch = x_batch + X_test
@@ -187,7 +185,7 @@ for message in consumer:
 			y_rbt.extend(y_pred_river_rbt)
 			y_rhfdg.extend(y_pred_river_hfdg)
 			y_snarimax.extend(y_pred_river_snarimax)
-			y_arima.extend(y_pred_arima)
+			#y_arima.extend(y_pred_arima)
 
 			ax1.plot(
 				stream[MIN_TRAIN + 1: -1], color='green', label='Stream data', linewidth=4
@@ -198,7 +196,7 @@ for message in consumer:
 			ax1.plot(y_rbt, color='red', label='River Bagging regressor')
 			ax1.plot(y_rhfdg, color='blue', label='River Hoeffding tree regressor')
 			ax1.plot(y_snarimax, color='black', label='River SNARIMAX model')
-			ax1.plot(y_arima, color='', label='Batch ARIMA model')
+			#ax1.plot(y_arima, color='', label='Batch ARIMA model')
 
 			ax2.plot(lm_rmse, color='magenta', label='Linear model')
 			ax2.plot(river_lm_rmse, color='cyan', label='River linear model')
@@ -206,7 +204,7 @@ for message in consumer:
 			ax2.plot(rbt_rmse, color='red', label='River Bagging regressor')
 			ax2.plot(hfdg_rmse, color='blue', label='River Hoeffding tree regressor')
 			ax2.plot(river_ts_rmse, color='black', label='River SNARIMAX model')
-			ax1.plot(arima_mse, color='', label='Batch ARIMA model')
+			#ax1.plot(arima_mse, color='', label='Batch ARIMA model')
 
 			if not is_plotted:
 				ax1.legend()
