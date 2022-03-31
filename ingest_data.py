@@ -5,17 +5,15 @@ import urllib.request
 from kafka import KafkaProducer
 import ast
 
-producer = KafkaProducer(bootstrap_servers="localhost:9092")
-topic_name = "stocks_test"
+stock_name = 'AMZN'
+topic_name = 'stocks_test'
+time_sleep = 5
 
-i = 0
+producer = KafkaProducer(bootstrap_servers="localhost:9092")
 
 while True:
-	ticker = yf.Ticker("MSFT")
+	ticker = yf.Ticker(stock_name)
 
-	"""if i == 0:
-					message_df = ticker.history(period="1d", interval="1m")
-				else:"""
 	message_df = ticker.history(period="1d", interval="1m").iloc[-1]
 
 	message = message_df.to_json(orient="index").encode("utf-8")
@@ -25,8 +23,14 @@ while True:
 	print(f"Sending stocks info to topic: {topic_name} at time {time.time()}")
 	print(message)
 
-	time.sleep(1)
-    
+	time.sleep(time_sleep)
+
+
+
+
+
+
+
 
 
 
