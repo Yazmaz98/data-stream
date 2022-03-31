@@ -5,6 +5,7 @@ import pmdarima as pm
 from statsmodels.tsa.arima.model import ARIMA
 from tqdm import tqdm
 
+
 def create_dataset(X: np.array, n_samples: int, mode: str='direct'):
     """
     Function takes time-series X as an input and provides time-series X0 and
